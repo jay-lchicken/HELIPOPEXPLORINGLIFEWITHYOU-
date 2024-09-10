@@ -8,6 +8,7 @@ import CoreLocation
 import Foundation
 import SwiftUICore
 class LogManagementViewModel: ObservableObject {
+    @Published var fontSize: ContentSizeCategory = .large
     @Published var logs: [log] = []
     private let key = "announcementList"
     init() {

@@ -15,8 +15,12 @@ struct ContentView: View {
             TabView{
                 LogView(viewModel: model)
                     .tabItem { Label("Log", systemImage: "list.bullet") }
+                SettingsView(viewModel: model)
+                    .tabItem { Label("Settings", systemImage: "gearshape")
+                    }
             }
         }
+        .environment(\.sizeCategory, model.fontSize)
         
     }
 }
