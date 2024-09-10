@@ -1,0 +1,15 @@
+{
+  "originHash" : "6ac8d128f8f0675952dd49812f1737c704009ece4f2927af83e051ace33ecdeb",
+  "pins" : [
+    {
+      "identity" : "datasave",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jay-lchicken/DataSave/",
+      "state" : {
+        "branch" : "main",
+        "revision" : "1067a377fb622676466213748a1e33850ee5ca69"
+      }
+    }
+  ],
+  "version" : 3
+}
