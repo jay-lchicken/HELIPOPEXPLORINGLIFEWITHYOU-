@@ -29,7 +29,7 @@ struct LogView: View {
                     }
                     .contextMenu{
                         Button(role:.destructive){
-                            viewModel.logs.remove(at: i)
+                            viewModel.deleteData(index: i)
                         }label:{
                             Text("Delete")
                         }
