@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct LogView: View {
-    @State var showNewItemView: Bool = false
     @ObservedObject var viewModel : LogManagementViewModel
     var body: some View {
         NavigationStack{
@@ -38,7 +37,7 @@ struct LogView: View {
             }
             .toolbar{
                 Button{
-                    showNewItemView.toggle()
+                    viewModel.showNewItemView.toggle()
                 }label: {
                     Label("Add New Log", systemImage: "plus")
                 }
@@ -46,8 +45,8 @@ struct LogView: View {
             .navigationTitle("Log View")
             
         }
-        .sheet(isPresented: $showNewItemView){
-            NewLogView(viewModel: viewModel)
+        .sheet(isPresented: $viewModel.showNewItemView){
+            informationField(model: viewModel)
         }
         
     }

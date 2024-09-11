@@ -10,7 +10,15 @@ import SwiftUICore
 import DataSave
 class LogManagementViewModel: ObservableObject {
     @Published var fontSize: ContentSizeCategory = .large
+    @Published var showAlert: Bool = false
     @Published var logs: [log] = []
+    @Published var showNewItemView: Bool = false
+    //Variables for new log view
+    @Published var nameOfAccomplice: String = ""
+    @Published var whyWasTheCoinStolen: String = ""
+    @Published var howWasTheCoinStolen: String = ""
+    @Published var locationFled: CLLocationCoordinate2D? = nil
+    @Published var locationNow: CLLocationCoordinate2D? = nil
     private let key = "announcementList"
     init() {
 //        if let data = UserDefaults.standard.data(forKey: key) {
@@ -36,8 +44,39 @@ class LogManagementViewModel: ObservableObject {
         let success = DataSave.saveToUserDefaults(logs, forKey: key)
         print("deleted data \(success)")
     }
-    func add(name: String, why: String, how: String, locationFledd: CLLocationCoordinate2D, locationNoww: CLLocationCoordinate2D){
-        let currentData = log(nameOfAccomplice: name, locationFled: log.LocationData(from: CLLocation(latitude: locationFledd.latitude, longitude: locationFledd.longitude)), dateAdded: Date().timeIntervalSince1970, whyStolen: why, whereAreTheyNow: log.LocationData(from: CLLocation(latitude: locationNoww.latitude, longitude: locationNoww.longitude)), howTheyStoleTheCoin: how)
+    func verify() -> Bool{
+        guard !nameOfAccomplice.isEmpty else {
+            showAlert = true
+            return false
+        }
+        guard !whyWasTheCoinStolen.isEmpty else {
+            showAlert = true
+            return false
+        }
+        guard !howWasTheCoinStolen.isEmpty else {
+            showAlert = true
+            return false
+        }
+        guard locationFled != nil else {
+            showAlert = true
+            return false
+        }
+        guard locationNow != nil else {
+            showAlert = true
+            return false
+        }
+        return true
+    }
+    func add(){
+        
+        
+        let currentData = log(nameOfAccomplice: nameOfAccomplice, locationFled: log.LocationData(from: CLLocation(latitude: locationFled!.latitude, longitude: locationFled!.longitude)), dateAdded: Date().timeIntervalSince1970, whyStolen: whyWasTheCoinStolen, whereAreTheyNow: log.LocationData(from: CLLocation(latitude: locationNow!.latitude, longitude: locationNow!.longitude)), howTheyStoleTheCoin: howWasTheCoinStolen)
+       nameOfAccomplice = ""
+       whyWasTheCoinStolen = ""
+       howWasTheCoinStolen = ""
+       locationNow = nil
+       locationFled = nil
+        
         addData(logging: currentData)
     }
 

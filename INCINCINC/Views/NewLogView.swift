@@ -8,23 +8,13 @@
 import SwiftUI
 
 import MapKit
-struct NewLogView: View {
-    @ObservedObject var viewModel : LogManagementViewModel
-    @State var showAlert: Bool = false
-    @State var showSheet: Bool = false
-    @State var showSheet2: Bool = false
-    @State var nameOfAccomplice: String = ""
-    @State var whyWasTheCoinStolen: String = ""
-    @State var howWasTheCoinStolen: String = ""
-    @State var locationFled: CLLocationCoordinate2D? = nil
-    @State var locationNow: CLLocationCoordinate2D? = nil
-    @Environment(\.dismiss) var dismiss
-    var body: some View {
+struct informationField: View{
+    @ObservedObject var model: LogManagementViewModel
+    var body: some View{
         NavigationStack{
             ScrollView{
                 VStack{
-                    Divider()
-                    TextField("Name of Accomplice", text: $nameOfAccomplice)
+                    TextField("Name of Accomplice", text: $model.nameOfAccomplice)
                         .frame(width: 350, height: 20)
                     Divider()
                     ZStack(alignment: .topLeading) {
@@ -33,12 +23,12 @@ struct NewLogView: View {
                             .frame(width: 350, height: 200)
 
 
-                        TextEditor(text: $whyWasTheCoinStolen)
+                        TextEditor(text: $model.whyWasTheCoinStolen)
                             .padding(8)
                             .frame(width: 350, height: 200)
 
 
-                        if whyWasTheCoinStolen.isEmpty {
+                        if model.whyWasTheCoinStolen.isEmpty {
                             Text("Why was the coin stolen?")
                                 .foregroundColor(.gray)
                                 .padding(.leading, 12)
@@ -51,80 +41,149 @@ struct NewLogView: View {
                             .frame(width: 350, height: 200)
 
 
-                        TextEditor(text: $howWasTheCoinStolen)
+                        TextEditor(text: $model.howWasTheCoinStolen)
                             .padding(8)
                             .frame(width: 350, height: 200)
 
 
-                        if howWasTheCoinStolen.isEmpty {
+                        if model.howWasTheCoinStolen.isEmpty {
                             Text("How was the coin stolen?")
                                 .foregroundColor(.gray)
                                 .padding(.leading, 12)
                                 .padding(.top, 15)
                         }
                     }
-                    Button{
-                        showSheet = true
-                    }label: {
-                        Text("Select Location Fled")
+                    VStack {
+                        if !model.howWasTheCoinStolen.isEmpty && !model.whyWasTheCoinStolen.isEmpty && !model.nameOfAccomplice.isEmpty {
+                            NavigationLink(destination: selectLocationFled(viewModel: model)) {
+                                ZStack {
+                                    Capsule()
+                                        .frame(width: 350, height: 50)
+                                        .foregroundStyle(.blue)
+                                    Text("Next")
+                                        .foregroundStyle(.black)
+                                        .bold()
+                                        .font(.system(size: 30))
+                                }
+                            }
+                        } else {
+                            Button(action: {
+                                model.showAlert.toggle()
+                            }) {
+                                ZStack {
+                                    Capsule()
+                                        .frame(width: 350, height: 50)
+                                        .foregroundStyle(.blue)
+                                    Text("Next")
+                                        .foregroundStyle(.black)
+                                        .bold()
+                                        .font(.system(size: 30))
+                                }
+                            }
+                            
+                        }
                     }
-                    if !(locationFled==nil) {
+
+                }
+                .padding(.top, 20)
+                .alert(isPresented: $model.showAlert){
+                    Alert(title: Text("Error"), message: Text("Please fill in all fields"))
+                }
+
+
+            }
+
+        }
+    }
+}
+struct selectLocationFled: View {
+    @ObservedObject var viewModel : LogManagementViewModel
+    var body: some View{
+        NavigationStack{
+            ScrollView{
+                VStack{
+                    Text("Select Location Fled")
+                    LocationPickerView(selectedCoordinate: $viewModel.locationFled)
+                    if !(viewModel.locationFled==nil) {
                         VStack{
                             Text("Location Fled Coordinates")
-                            Text("\(locationFled!.latitude)")
-                            Text("\(locationFled!.longitude)")
+                            Text("\(viewModel.locationFled!.latitude)")
+                            Text("\(viewModel.locationFled!.longitude)")
                         }
                     }
-                    Button{
-                        showSheet2 = true
-                    }label: {
-                        Text("Select Where are they now")
+                    VStack {
+                        if viewModel.locationFled != nil {
+                            NavigationLink(destination: selectWhereTheyAreNow(model: viewModel)) {
+                                ZStack {
+                                    Capsule()
+                                        .frame(width: 350, height: 50)
+                                        .foregroundStyle(.blue)
+                                    Text("Next")
+                                        .foregroundStyle(.black)
+                                        .bold()
+                                        .font(.system(size: 30))
+                                }
+                            }
+                        } else {
+                            Button(action: {
+                                viewModel.showAlert.toggle()
+                            }) {
+                                ZStack {
+                                    Capsule()
+                                        .frame(width: 350, height: 50)
+                                        .foregroundStyle(.blue)
+                                    Text("Next")
+                                        .foregroundStyle(.black)
+                                        .bold()
+                                        .font(.system(size: 30))
+                                }
+                            }
+                            
+                        }
                     }
-                    if !(locationNow==nil) {
+                }
+                .padding(.top, 20)
+            }
+            .alert(isPresented: $viewModel.showAlert){
+                Alert(title: Text("Error"), message: Text("Please select a location"))
+            }
+        }
+    }
+}
+struct selectWhereTheyAreNow: View {
+    @ObservedObject var model : LogManagementViewModel
+    @Environment(\.dismiss) var dismiss
+    var body: some View{
+        NavigationStack{
+            ScrollView{
+                VStack{
+                    Text("Select Where are they now")
+                    LocationPickerView(selectedCoordinate: $model.locationNow)
+                    if !(model.locationNow==nil) {
                         VStack{
-                            Text("Location Now Coordinates")
-                            Text("\(locationFled!.latitude)")
-                            Text("\(locationFled!.longitude)")
+                            Text("Location Fled Coordinates")
+                            Text("\(model.locationNow!.latitude)")
+                            Text("\(model.locationNow!.longitude)")
                         }
                     }
                     Button{
-                        guard !nameOfAccomplice.isEmpty else {
-                            showAlert = true
-                            return
+                        let success = model.verify()
+                        if success == true{
+                            print("Success")
+                            model.add()
+                            model.showNewItemView.toggle()
+                        }else{
+                            print("Failure")
+                            model.showAlert.toggle()
                         }
-                        guard !whyWasTheCoinStolen.isEmpty else {
-                            showAlert = true
-                            return
-                        }
-                        guard !howWasTheCoinStolen.isEmpty else {
-                            showAlert = true
-                            return
-                        }
-                        guard locationFled != nil else {
-                            showAlert = true
-                            return
-                        }
-                        guard locationNow != nil else {
-                            showAlert = true
-                            return
-                        }
-                        do{
-                            try viewModel.add(name: nameOfAccomplice, why: whyWasTheCoinStolen, how: howWasTheCoinStolen, locationFledd: locationFled!, locationNoww: locationNow!)
-                        }catch{
-                            showAlert = true
-                        }
-                        dismiss()
-                        nameOfAccomplice = ""
-                        whyWasTheCoinStolen = ""
-                        howWasTheCoinStolen = ""
-                        locationNow = nil
-                        locationFled = nil
+                        
                     }label: {
                         ZStack{
                             Capsule()
                                 .frame(width: 350, height: 50)
                                 .foregroundStyle(.blue)
-                            VStack{                                Text("Add")
+                            VStack{
+                                Text("Add")
                                     .foregroundStyle(.black)
                                     .bold()
                                     .font(.system(size: 30))
@@ -134,84 +193,17 @@ struct NewLogView: View {
 
                     }
                 }
-            }
-            .navigationBarTitle("New Log")
-        }
-        .alert(isPresented: $showAlert) {
-            Alert(title: Text("Error"), message: Text("Please fill in all fields. If the error persists, please contact support!"))
-        }
-        .sheet(isPresented: $showSheet){
-            LocationPickerView(selectedCoordinate: $locationFled)
-        }
-        .sheet(isPresented: $showSheet2){
-            LocationPickerView2(selectedCoordinate: $locationNow)
-        }
-        
-    }
-}
+                .padding(.top, 20)
 
-struct LocationPickerView2: View {
-    @Environment(\.dismiss) var dismiss
-    @State private var searchText = ""
-    @Binding var selectedCoordinate: CLLocationCoordinate2D?
-    @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
-                                                   span: MKCoordinateSpan(latitudeDelta: 0.001, longitudeDelta: 0.001)) //Location Set TO San Francisco
-    
-    var body: some View {
-        VStack {
-            Text("Please select a location")
-            SearchBar(text: $searchText, onSearchButtonClicked: performSearch)
-            
-            
-            SelectionMapView(selectedCoordinate: $selectedCoordinate, region: $region)
-                .frame(height: 400)
-            
-            
-            if let coordinate = selectedCoordinate {
-                
-                Button{
-                    dismiss()
-                }label: {
-                    ZStack{
-                        Capsule()
-                            .frame(width: 350, height: 100)
-                            .foregroundStyle(.green)
-                        VStack{
-                            Text("Selected Latitude: \(coordinate.latitude) ")
-                                
-                            Text("Selected Longtitude: \(coordinate.longitude)")
-                                
-                                
-                            Text("Press to dismiss")
-                        }
-                    }
-                    
-                }
             }
             
-            Spacer()
         }
-        .padding()
-    }
-    
-    private func performSearch() {
-        let request = MKLocalSearch.Request()
-        request.naturalLanguageQuery = searchText
-        
-        let search = MKLocalSearch(request: request)
-        search.start { response, error in
-            if let response = response {
-                let item = response.mapItems.first
-                if let coordinate = item?.placemark.coordinate {
-                    region = MKCoordinateRegion(center: coordinate,
-                                                span: MKCoordinateSpan(latitudeDelta: 0.001, longitudeDelta: 0.001)) //Shows Location with a 1km Radius
-                }
-            }
+        .alert(isPresented: $model.showAlert){
+            Alert(title: Text("Error"), message: Text("Please ensure that all fields are filled up"))
         }
     }
 }
 struct LocationPickerView: View {
-    @Environment(\.dismiss) var dismiss
     @State private var searchText = ""
     @Binding var selectedCoordinate: CLLocationCoordinate2D?
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
@@ -219,7 +211,7 @@ struct LocationPickerView: View {
     
     var body: some View {
         VStack {
-            Text("Please select a location")
+            Spacer()
             SearchBar(text: $searchText, onSearchButtonClicked: performSearch)
             
             
@@ -227,27 +219,6 @@ struct LocationPickerView: View {
                 .frame(height: 400)
             
             
-            if let coordinate = selectedCoordinate {
-                
-                Button{
-                    dismiss()
-                }label: {
-                    ZStack{
-                        Capsule()
-                            .frame(width: 350, height: 100)
-                            .foregroundStyle(.green)
-                        VStack{
-                            Text("Selected Latitude: \(coordinate.latitude) ")
-                                
-                            Text("Selected Longtitude: \(coordinate.longitude)")
-                                
-                                
-                            Text("Press to dismiss")
-                        }
-                    }
-                    
-                }
-            }
             
             Spacer()
         }
@@ -278,6 +249,7 @@ struct SearchBar: UIViewRepresentable {
     func makeUIView(context: Context) -> UISearchBar {
         let searchBar = UISearchBar(frame: .zero)
         searchBar.delegate = context.coordinator
+        searchBar.placeholder = "Search"
         return searchBar
     }
     

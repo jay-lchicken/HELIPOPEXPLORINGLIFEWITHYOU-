@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		06D109AE2C905DFA002769C3 /* DataSave in Frameworks */ = {isa = PBXBuildFile; productRef = 06D109AD2C905DFA002769C3 /* DataSave */; };
+		069F42BB2C906A3900411F8B /* DataSave in Frameworks */ = {isa = PBXBuildFile; productRef = 069F42BA2C906A3900411F8B /* DataSave */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				06D109AE2C905DFA002769C3 /* DataSave in Frameworks */,
+				069F42BB2C906A3900411F8B /* DataSave in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,7 +70,7 @@
 			);
 			name = INCINCINC;
 			packageProductDependencies = (
-				06D109AD2C905DFA002769C3 /* DataSave */,
+				069F42BA2C906A3900411F8B /* DataSave */,
 			);
 			productName = INCINCINC;
 			productReference = 06D1097F2C9030E4002769C3 /* INCINCINC.app */;
@@ -101,7 +101,7 @@
 			mainGroup = 06D109762C9030E4002769C3;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				06D109AC2C905DFA002769C3 /* XCRemoteSwiftPackageReference "DataSave" */,
+				069F42B92C906A3900411F8B /* XCRemoteSwiftPackageReference "DataSave" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 06D109802C9030E4002769C3 /* Products */;
@@ -335,7 +335,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		06D109AC2C905DFA002769C3 /* XCRemoteSwiftPackageReference "DataSave" */ = {
+		069F42B92C906A3900411F8B /* XCRemoteSwiftPackageReference "DataSave" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jay-lchicken/DataSave/";
 			requirement = {
@@ -346,9 +346,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		06D109AD2C905DFA002769C3 /* DataSave */ = {
+		069F42BA2C906A3900411F8B /* DataSave */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 06D109AC2C905DFA002769C3 /* XCRemoteSwiftPackageReference "DataSave" */;
+			package = 069F42B92C906A3900411F8B /* XCRemoteSwiftPackageReference "DataSave" */;
 			productName = DataSave;
 		};
 /* End XCSwiftPackageProductDependency section */
