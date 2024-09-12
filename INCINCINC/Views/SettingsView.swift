@@ -38,51 +38,63 @@ struct SettingsView: View {
                     .pickerStyle(WheelPickerStyle())
                     .padding()
                     .frame(width: 350)
-                }
-                Button(action: {isExporting = true}) {
-                                    Text("Export Logs")
-                                }
-                                .fileExporter(
-                                    isPresented: $isExporting,
-                                    document: ExportDocument(data: exportData()),
-                                    contentType: .json,
-                                    defaultFilename: "logs"
-                                ) { result in
-                                    switch result {
-                                    case .success(let url):
-                                        print("Exported to: \(url)")
-                                    case .failure(let error):
-                                        print("Failed to export: \(error.localizedDescription)")
+                    Button(action: {isExporting = true}) {
+                                        Label("Export", systemImage: "square.and.arrow.up")
                                     }
-                                }
-                Button(action: {
-                    isImporting = true
-                }) {
-                    Text("Import Logs")
-                }
-                .fileImporter(
-                    isPresented: $isImporting,
-                    allowedContentTypes: [.json],
-                    allowsMultipleSelection: false
-                ) { result in
-                    do {
-                        guard let selectedFile: URL = try result.get().first else { return }
-                        importLogs(from: selectedFile)
-                        viewModel.sync()
+                                    .fileExporter(
+                                        isPresented: $isExporting,
+                                        document: ExportDocument(data: exportData()),
+                                        contentType: .json,
+                                        defaultFilename: "logs"
+                                    ) { result in
+                                        switch result {
+                                        case .success(let url):
+                                            print("Exported to: \(url)")
+                                        case .failure(let error):
+                                            print("Failed to export: \(error.localizedDescription)")
+                                        }
+                                    }
+                    Button(action: {
+                        viewModel.showAlert = true
+                    }) {
+                        Label("Import", systemImage: "square.and.arrow.down")
+                    }
+                    .fileImporter(
+                        isPresented: $isImporting,
+                        allowedContentTypes: [.json],
+                        allowsMultipleSelection: false
+                    ) { result in
+                        do {
+                            guard let selectedFile: URL = try result.get().first else { return }
+                            importLogs(from: selectedFile)
+                            viewModel.sync()
+                            
+                        } catch {
+                            print("Failed to import: \(error.localizedDescription)")
+                            
+                            
+                        }
                         
-                    } catch {
-                        print("Failed to import: \(error.localizedDescription)")
+                        
                         
                         
                     }
-                    
-                    
-                    
-                    
                 }
+                
             }
             .navigationTitle("Settings")
+            
 
+        }
+        .alert(isPresented: $viewModel.showAlert) {
+            Alert(
+                title: Text("Confirm Importation"),
+                message: Text("Importing the new data will delete all existing data. Are you sure you want to continue? You may want to export your current data first."),
+                primaryButton: .destructive(Text("Delete and Import")) {
+                    isImporting = true
+                },
+                secondaryButton: .cancel()
+            )
         }
     }
     private func exportData() -> Data {
