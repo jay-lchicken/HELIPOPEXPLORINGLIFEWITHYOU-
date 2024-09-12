@@ -13,6 +13,10 @@ struct ContentView: View {
     var body: some View {
         VStack {
             TabView{
+                HomeView(viewModel: model)
+                    .tabItem({
+                        Label("Home", systemImage: "house")
+                    })
                 LogView(viewModel: model)
                     .tabItem { Label("Log", systemImage: "list.bullet") }
                 SettingsView(viewModel: model)

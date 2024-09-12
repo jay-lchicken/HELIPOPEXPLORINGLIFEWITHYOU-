@@ -12,7 +12,9 @@ struct LogView: View {
     @State var index = 0
     var body: some View {
         NavigationStack{
-            List(viewModel.logs.indices, id: \.self){i in
+            List(viewModel.logs.indices.sorted(by: {
+                viewModel.logs[$0].dateAdded > viewModel.logs[$1].dateAdded
+            }), id: \.self){i in
                 NavigationLink{
                     LogDetailsView(log: $viewModel.logs[i])
                 }label: {
