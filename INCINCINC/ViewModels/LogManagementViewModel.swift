@@ -36,6 +36,9 @@ class LogManagementViewModel: ObservableObject {
         }
         
     }
+    func sync(){
+        let success = DataSave.saveToUserDefaults(logs, forKey: key)
+    }
     func addData(logging: log){
         logs.append(logging)
         let success = DataSave.saveToUserDefaults(logs, forKey: key)

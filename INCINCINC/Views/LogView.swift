@@ -45,7 +45,8 @@ struct LogView: View {
                     title: Text("Confirm Deletion?"),
                     message: Text("Are you sure you want to delete this log?"),
                     primaryButton: .destructive(Text("Delete")) {
-                        viewModel.logs.remove(at: index)
+                        viewModel.deleteData(index: index)
+                        
                         viewModel.generator.notificationOccurred(.success)
                     },
                     secondaryButton: .cancel()

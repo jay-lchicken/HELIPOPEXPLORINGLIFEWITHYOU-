@@ -131,7 +131,4 @@ struct MapViewss: UIViewRepresentable {
         }
     }
 }
-#Preview{
-    @Previewable @StateObject var viewModel = LogManagementViewModel()
-    HomeView(viewModel: viewModel)
-}
+
