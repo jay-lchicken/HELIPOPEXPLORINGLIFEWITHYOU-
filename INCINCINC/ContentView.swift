@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject var model = LogManagementViewModel()
-
+    @AppStorage("darkMode") var darkMode: Bool = false
     var body: some View {
         VStack {
             TabView{
@@ -20,6 +20,7 @@ struct ContentView: View {
                     }
             }
         }
+        .preferredColorScheme(darkMode ? .dark : .light)
         .environment(\.sizeCategory, model.fontSize)
         
     }

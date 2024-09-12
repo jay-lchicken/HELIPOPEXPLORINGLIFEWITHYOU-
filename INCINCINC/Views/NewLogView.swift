@@ -68,6 +68,7 @@ struct informationField: View{
                             }
                         } else {
                             Button(action: {
+                                model.generator.notificationOccurred(.success)
                                 model.showAlert.toggle()
                             }) {
                                 ZStack {
@@ -126,6 +127,7 @@ struct selectLocationFled: View {
                             }
                         } else {
                             Button(action: {
+                                viewModel.generator.notificationOccurred(.error)
                                 viewModel.showAlert.toggle()
                             }) {
                                 ZStack {
@@ -172,9 +174,11 @@ struct selectWhereTheyAreNow: View {
                             print("Success")
                             model.add()
                             model.showNewItemView.toggle()
+                            model.generator.notificationOccurred(.success)
                         }else{
                             print("Failure")
                             model.showAlert.toggle()
+                            model.generator.notificationOccurred(.error)
                         }
                         
                     }label: {

@@ -8,6 +8,7 @@ import CoreLocation
 import Foundation
 import SwiftUICore
 import DataSave
+import UIKit
 class LogManagementViewModel: ObservableObject {
     @Published var fontSize: ContentSizeCategory = .large
     @Published var showAlert: Bool = false
@@ -19,6 +20,7 @@ class LogManagementViewModel: ObservableObject {
     @Published var howWasTheCoinStolen: String = ""
     @Published var locationFled: CLLocationCoordinate2D? = nil
     @Published var locationNow: CLLocationCoordinate2D? = nil
+    @Published var generator = UINotificationFeedbackGenerator()
     private let key = "announcementList"
     init() {
 //        if let data = UserDefaults.standard.data(forKey: key) {
@@ -32,6 +34,7 @@ class LogManagementViewModel: ObservableObject {
         } else {
             print("No data found for the given key.")
         }
+        
     }
     func addData(logging: log){
         logs.append(logging)
