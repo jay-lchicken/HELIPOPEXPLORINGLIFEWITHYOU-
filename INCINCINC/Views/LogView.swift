@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LogView: View {
     @ObservedObject var viewModel : LogManagementViewModel
+    @State var isPresented: Bool = false
     @State var index = 0
     var body: some View {
         NavigationStack{
@@ -60,12 +61,21 @@ struct LogView: View {
                 }label: {
                     Label("Add New Log", systemImage: "plus")
                 }
+                Button{
+                    isPresented.toggle()
+                }label: {
+                    Label("Show Dashboard", systemImage: "point.3.connected.trianglepath.dotted")
+                }
+
             }
             .navigationTitle("Log View")
             
         }
         .sheet(isPresented: $viewModel.showNewItemView){
             informationField(model: viewModel)
+        }
+        .sheet(isPresented: $isPresented){
+            ConnectedView(viewModel: viewModel)
         }
         
     }

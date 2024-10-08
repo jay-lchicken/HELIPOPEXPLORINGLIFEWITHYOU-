@@ -6,18 +6,21 @@
 //
 
 import SwiftUI
-import UniformTypeIdentifiers 
+import UniformTypeIdentifiers
 struct SettingsView: View {
-    @ObservedObject var viewModel : LogManagementViewModel
+    @ObservedObject var viewModel: LogManagementViewModel
+    @State private var selectedFileURL: URL? = nil
     @AppStorage("darkMode") var darkMode: Bool = false
     @State private var isImporting = false
     @State private var isExporting = false
     @State private var exportUrl: URL?
+    @State var showSecondAlert: Bool = false
+    
     var body: some View {
-        NavigationStack{
-            VStack{
-                List{
-                    Toggle(isOn: $darkMode ){
+        NavigationStack {
+            VStack {
+                List {
+                    Toggle(isOn: $darkMode) {
                         Text("Dark Mode: \(darkMode ? "On" : "Off")")
                     }
                     
@@ -38,26 +41,32 @@ struct SettingsView: View {
                     .pickerStyle(WheelPickerStyle())
                     .padding()
                     .frame(width: 350)
-                    Button(action: {isExporting = true}) {
-                                        Label("Export", systemImage: "square.and.arrow.up")
-                                    }
-                                    .fileExporter(
-                                        isPresented: $isExporting,
-                                        document: ExportDocument(data: exportData()),
-                                        contentType: .json,
-                                        defaultFilename: "logs"
-                                    ) { result in
-                                        switch result {
-                                        case .success(let url):
-                                            print("Exported to: \(url)")
-                                        case .failure(let error):
-                                            print("Failed to export: \(error.localizedDescription)")
-                                        }
-                                    }
+                    
                     Button(action: {
-                        viewModel.showAlert = true
+                        isExporting = true
                     }) {
-                        Label("Import", systemImage: "square.and.arrow.down")
+                        Label("Export Logs", systemImage: "square.and.arrow.up")
+                    }
+                    .padding()
+                    .frame(width: 350)
+                    .fileExporter(
+                        isPresented: $isExporting,
+                        document: ExportDocument(data: exportData()),
+                        contentType: .json,
+                        defaultFilename: "logs"
+                    ) { result in
+                        switch result {
+                        case .success(let url):
+                            print("Exported to: \(url)")
+                        case .failure(let error):
+                            print("Failed to export: \(error.localizedDescription)")
+                        }
+                    }
+                    
+                    Button(action: {
+                        isImporting = true
+                    }) {
+                        Label("Import Logs", systemImage: "square.and.arrow.down")
                     }
                     .fileImporter(
                         isPresented: $isImporting,
@@ -66,40 +75,22 @@ struct SettingsView: View {
                     ) { result in
                         do {
                             guard let selectedFile: URL = try result.get().first else { return }
-                            importLogs(from: selectedFile)
-                            viewModel.sync()
-                            
+                            if selectedFile.startAccessingSecurityScopedResource(){
+                                importLogs(from: selectedFile)
+                            }
+                            selectedFile.stopAccessingSecurityScopedResource()
                         } catch {
                             print("Failed to import: \(error.localizedDescription)")
-                            
-                            
                         }
-                        
-                        
-                        
-                        
                     }
                 }
-                
+                .navigationTitle("Settings")
             }
-            .navigationTitle("Settings")
-            
-
-        }
-        .alert(isPresented: $viewModel.showAlert) {
-            Alert(
-                title: Text("Confirm Importation"),
-                message: Text("Importing the new data will delete all existing data. Are you sure you want to continue? You may want to export your current data first."),
-                primaryButton: .destructive(Text("Delete and Import")) {
-                    isImporting = true
-                },
-                secondaryButton: .cancel()
-            )
         }
     }
-    private func exportData() -> Data {
+    
+    func exportData() -> Data {
         let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
         do {
             return try encoder.encode(viewModel.logs)
         } catch {
@@ -107,20 +98,20 @@ struct SettingsView: View {
             return Data()
         }
     }
-
-    private func importLogs(from url: URL) {
+    
+    func importLogs(from url: URL) {
         do {
             let data = try Data(contentsOf: url)
             let decoder = JSONDecoder()
             let importedLogs = try decoder.decode([log].self, from: data)
             viewModel.logs = importedLogs
+            viewModel.sync()
+
         } catch {
             print("Error decoding logs: \(error)")
         }
     }
 }
-
-
 struct ExportDocument: FileDocument {
     static var readableContentTypes: [UTType] { [.json] }
     var data: Data

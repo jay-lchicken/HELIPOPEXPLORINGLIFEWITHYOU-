@@ -13,9 +13,9 @@ struct ContentView: View {
     var body: some View {
         VStack {
             TabView{
-                HomeView(viewModel: model)
+                HomeView()
                     .tabItem({
-                        Label("Home", systemImage: "house")
+                        Label("Home", systemImage: "house.circle")
                     })
                 LogView(viewModel: model)
                     .tabItem { Label("Log", systemImage: "list.bullet") }

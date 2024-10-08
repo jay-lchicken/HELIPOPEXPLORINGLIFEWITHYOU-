@@ -7,7 +7,7 @@
 
 import SwiftUI
 import MapKit
-struct HomeView: View {
+struct ConnectedView: View {
     @ObservedObject var viewModel: LogManagementViewModel
     var body: some View {
         NavigationStack{
@@ -34,6 +34,7 @@ struct MapViews: UIViewRepresentable {
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
         mapView.removeAnnotations(mapView.annotations)
+
         for log in logs {
             let annotation = MKPointAnnotation()
             annotation.title = log.nameOfAccomplice
@@ -42,16 +43,10 @@ struct MapViews: UIViewRepresentable {
             mapView.addAnnotation(annotation)
         }
 
-       
-        if let firstLog = logs.first {
-            let region = MKCoordinateRegion(
-                center: CLLocationCoordinate2D(latitude: firstLog.locationFled.latitude, longitude: firstLog.locationFled.longitude),
-                span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-            )
-            mapView.setRegion(region, animated: true)
+        if !logs.isEmpty {
+            mapView.showAnnotations(mapView.annotations, animated: true)
         }
     }
-
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -97,13 +92,17 @@ struct MapViewss: UIViewRepresentable {
             mapView.addAnnotation(annotation)
         }
 
-        if let firstLog = logs.first {
-            let region = MKCoordinateRegion(
-                center: CLLocationCoordinate2D(latitude: firstLog.locationFled.latitude, longitude: firstLog.locationFled.longitude),
-                span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-            )
-            mapView.setRegion(region, animated: true)
+//        if let firstLog = logs.first {
+//            let region = MKCoordinateRegion(
+//                center: CLLocationCoordinate2D(latitude: firstLog.locationFled.latitude, longitude: firstLog.locationFled.longitude),
+//                span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+//            )
+//            mapView.setRegion(region, animated: true)
+//        }
+        if !logs.isEmpty {
+            mapView.showAnnotations(mapView.annotations, animated: true)
         }
+
     }
 
     func makeCoordinator() -> Coordinator {
