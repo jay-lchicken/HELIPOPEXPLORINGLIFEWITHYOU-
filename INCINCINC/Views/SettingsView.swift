@@ -15,14 +15,12 @@ struct SettingsView: View {
     @State private var isExporting = false
     @State private var exportUrl: URL?
     @State var showSecondAlert: Bool = false
-    
+    @State var showSuccess = false
     var body: some View {
         NavigationStack {
             VStack {
                 List {
-                    Toggle(isOn: $darkMode) {
-                        Text("Dark Mode: \(darkMode ? "On" : "Off")")
-                    }
+                    
                     
                     Picker("Font Size: \(viewModel.fontSize.hashValue)", selection: $viewModel.fontSize) {
                         Text("Extra Small").tag(ContentSizeCategory.extraSmall)
@@ -46,9 +44,8 @@ struct SettingsView: View {
                         isExporting = true
                     }) {
                         Label("Export Logs", systemImage: "square.and.arrow.up")
+
                     }
-                    .padding()
-                    .frame(width: 350)
                     .fileExporter(
                         isPresented: $isExporting,
                         document: ExportDocument(data: exportData()),
@@ -57,6 +54,7 @@ struct SettingsView: View {
                     ) { result in
                         switch result {
                         case .success(let url):
+                            showSuccess = true
                             print("Exported to: \(url)")
                         case .failure(let error):
                             print("Failed to export: \(error.localizedDescription)")
@@ -64,9 +62,11 @@ struct SettingsView: View {
                     }
                     
                     Button(action: {
-                        isImporting = true
+                        viewModel.showAlert = true
                     }) {
                         Label("Import Logs", systemImage: "square.and.arrow.down")
+
+                        
                     }
                     .fileImporter(
                         isPresented: $isImporting,
@@ -79,6 +79,7 @@ struct SettingsView: View {
                                 importLogs(from: selectedFile)
                             }
                             selectedFile.stopAccessingSecurityScopedResource()
+                            showSuccess = true
                         } catch {
                             print("Failed to import: \(error.localizedDescription)")
                         }
@@ -86,6 +87,20 @@ struct SettingsView: View {
                 }
                 .navigationTitle("Settings")
             }
+        }
+        .alert(isPresented: $viewModel.showAlert) {
+                    Alert(
+                        title: Text("Confirm Importation"),
+                        message: Text("Importing the new data will delete all existing data. Are you sure you want to continue? You may want to export your current data first."),
+                        primaryButton: .destructive(Text("Delete and Import")) {
+                            isImporting = true
+                        },
+                        secondaryButton: .cancel()
+                    )
+                }
+
+        .sheet(isPresented: $showSuccess){
+            SuccessView()
         }
     }
     

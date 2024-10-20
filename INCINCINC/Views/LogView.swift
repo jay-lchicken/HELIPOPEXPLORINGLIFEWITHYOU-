@@ -25,16 +25,32 @@ struct LogView: View {
                             Spacer()
                         }
                         HStack{
-                            Text("Date Added: \(Date(timeIntervalSince1970: viewModel.logs[i].dateAdded).formatted(date: .abbreviated, time: .shortened))")
+                            Text("Date occurred: \(Date(timeIntervalSince1970: viewModel.logs[i].dateHappened).formatted(date: .abbreviated, time: .shortened))")
                                 .font(.caption)
                             Spacer()
                         }
                     }
                     .contextMenu{
+                        
+                        Button(){
+                            viewModel.isEditing = true
+                            index = i
+                            viewModel.generator.notificationOccurred(.success)
+                            viewModel.nameOfAccomplice = viewModel.logs[i].nameOfAccomplice
+                            viewModel.whyWasTheCoinStolen = viewModel.logs[i].whyStolen
+                            viewModel.howWasTheCoinStolen = viewModel.logs[i].howTheyStoleTheCoin
+                            viewModel.locationFled = viewModel.logs[i].locationFled.toCLLocationCoordinate2D()
+                            viewModel.locationNow = viewModel.logs[i].whereAreTheyNow.toCLLocationCoordinate2D()
+                            viewModel.coinsCount = viewModel.logs[i].coinsCount
+                            viewModel.dateHappened = Date(timeIntervalSince1970: viewModel.logs[i].dateHappened)
+                        }label:{
+                            Text("Edit")
+                        }
                         Button(role:.destructive){
                             index = i
                             viewModel.showAlert = true
                             viewModel.generator.notificationOccurred(.warning)
+                            
                         }label:{
                             Text("Delete")
                         }
@@ -74,6 +90,7 @@ struct LogView: View {
         .sheet(isPresented: $viewModel.showNewItemView){
             informationField(model: viewModel)
         }
+        .sheet(isPresented: $viewModel.isEditing, content: {editInformationField(model: viewModel, editIndex: index)})
         .sheet(isPresented: $isPresented){
             ConnectedView(viewModel: viewModel)
         }

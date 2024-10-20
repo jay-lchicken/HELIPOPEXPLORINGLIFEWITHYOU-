@@ -10,6 +10,7 @@ import SwiftUICore
 import DataSave
 import UIKit
 class LogManagementViewModel: ObservableObject {
+    @Published var isEditing: Bool = false
     @Published var fontSize: ContentSizeCategory = .large
     @Published var showAlert: Bool = false
     @Published var logs: [log] = []
@@ -21,6 +22,8 @@ class LogManagementViewModel: ObservableObject {
     @Published var locationFled: CLLocationCoordinate2D? = nil
     @Published var locationNow: CLLocationCoordinate2D? = nil
     @Published var generator = UINotificationFeedbackGenerator()
+    @Published var coinsCount: Int = 0
+    @Published var dateHappened = Date()
     private let key = "announcementList"
     init() {
 //        if let data = UserDefaults.standard.data(forKey: key) {
@@ -71,19 +74,38 @@ class LogManagementViewModel: ObservableObject {
             showAlert = true
             return false
         }
+        guard coinsCount != 0 else {
+            showAlert = true
+            return false
+        }
+        
         return true
     }
     func add(){
         
         
-        let currentData = log(nameOfAccomplice: nameOfAccomplice, locationFled: log.LocationData(from: CLLocation(latitude: locationFled!.latitude, longitude: locationFled!.longitude)), dateAdded: Date().timeIntervalSince1970, whyStolen: whyWasTheCoinStolen, whereAreTheyNow: log.LocationData(from: CLLocation(latitude: locationNow!.latitude, longitude: locationNow!.longitude)), howTheyStoleTheCoin: howWasTheCoinStolen)
+        let currentData = log(nameOfAccomplice: nameOfAccomplice, locationFled: log.LocationData(from: CLLocation(latitude: locationFled!.latitude, longitude: locationFled!.longitude)), dateAdded: Date().timeIntervalSince1970, whyStolen: whyWasTheCoinStolen, whereAreTheyNow: log.LocationData(from: CLLocation(latitude: locationNow!.latitude, longitude: locationNow!.longitude)), howTheyStoleTheCoin: howWasTheCoinStolen, coinsCount: coinsCount, dateHappened: dateHappened.timeIntervalSince1970)
        nameOfAccomplice = ""
        whyWasTheCoinStolen = ""
        howWasTheCoinStolen = ""
        locationNow = nil
        locationFled = nil
-        
+        coinsCount = 0
+        dateHappened = Date()
         addData(logging: currentData)
     }
-
+    func edit(editIndex: Int){
+        
+        
+        let currentData = log(nameOfAccomplice: nameOfAccomplice, locationFled: log.LocationData(from: CLLocation(latitude: locationFled!.latitude, longitude: locationFled!.longitude)), dateAdded: Date().timeIntervalSince1970, whyStolen: whyWasTheCoinStolen, whereAreTheyNow: log.LocationData(from: CLLocation(latitude: locationNow!.latitude, longitude: locationNow!.longitude)), howTheyStoleTheCoin: howWasTheCoinStolen, coinsCount: coinsCount, dateHappened: dateHappened.timeIntervalSince1970)
+       nameOfAccomplice = ""
+       whyWasTheCoinStolen = ""
+       howWasTheCoinStolen = ""
+       locationNow = nil
+       locationFled = nil
+        coinsCount = 0
+        dateHappened = Date()
+        logs[editIndex] = currentData
+        sync()
+    }
 }

@@ -12,14 +12,14 @@ struct ConnectedView: View {
     var body: some View {
         NavigationStack{
             VStack{
-                Text("Locations Fled")
+                Text("Location of heist")
                     .bold()
                 MapViews(logs: viewModel.logs)
-                Text("Locations Now")
+                Text("Where they escaped to")
                     .bold()
                 MapViewss(logs: viewModel.logs)
             }
-            .navigationTitle("Home")
+            .navigationTitle("Overview")
         }
     }
 }
@@ -38,7 +38,7 @@ struct MapViews: UIViewRepresentable {
         for log in logs {
             let annotation = MKPointAnnotation()
             annotation.title = log.nameOfAccomplice
-            annotation.subtitle = Date(timeIntervalSince1970: log.dateAdded).formatted(date: .abbreviated, time: .shortened)
+            annotation.subtitle = Date(timeIntervalSince1970: log.dateHappened).formatted(date: .abbreviated, time: .shortened)
             annotation.coordinate = CLLocationCoordinate2D(latitude: log.locationFled.latitude, longitude: log.locationFled.longitude)
             mapView.addAnnotation(annotation)
         }
@@ -87,7 +87,7 @@ struct MapViewss: UIViewRepresentable {
         for log in logs {
             let annotation = MKPointAnnotation()
             annotation.title = log.nameOfAccomplice
-            annotation.subtitle = Date(timeIntervalSince1970: log.dateAdded).formatted(date: .abbreviated, time: .shortened)
+            annotation.subtitle = Date(timeIntervalSince1970: log.dateHappened).formatted(date: .abbreviated, time: .shortened)
             annotation.coordinate = CLLocationCoordinate2D(latitude: log.whereAreTheyNow.latitude, longitude: log.whereAreTheyNow.longitude)
             mapView.addAnnotation(annotation)
         }

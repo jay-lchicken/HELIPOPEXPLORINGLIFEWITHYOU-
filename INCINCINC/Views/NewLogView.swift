@@ -8,62 +8,91 @@
 import SwiftUI
 
 import MapKit
-struct informationField: View{
+struct informationField: View {
     @ObservedObject var model: LogManagementViewModel
-    var body: some View{
-        NavigationStack{
-            ScrollView{
-                VStack{
-                    TextField("Name of Accomplice", text: $model.nameOfAccomplice)
-                        .frame(width: 350, height: 20)
-                    Divider()
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 10) {
+                    ZStack {
+                        Capsule()
+                            .stroke(Color.black, lineWidth: 1)
+                            .frame(width: 350, height: 50)
+                        
+                        TextField("Name of Accomplice(s)", text: $model.nameOfAccomplice)
+                            .padding(.horizontal)
+                            .frame(width: 350, height: 50)
+                    }
+                    
                     ZStack(alignment: .topLeading) {
                         RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.gray, lineWidth: 1)
+                            .stroke(Color.black, lineWidth: 1)
                             .frame(width: 350, height: 200)
-
-
+                        
                         TextEditor(text: $model.whyWasTheCoinStolen)
-                            .padding(8)
+                            .padding(6)
                             .frame(width: 350, height: 200)
-
-
+                        
                         if model.whyWasTheCoinStolen.isEmpty {
                             Text("Why was the coin stolen?")
                                 .foregroundColor(.gray)
-                                .padding(.leading, 12)
-                                .padding(.top, 15)
+                                .padding(.leading, 16)
+                                .padding(.top, 12)
                         }
                     }
+                    
                     ZStack(alignment: .topLeading) {
                         RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.gray, lineWidth: 1)
+                            .stroke(Color.black, lineWidth: 1)
                             .frame(width: 350, height: 200)
-
-
+                        
                         TextEditor(text: $model.howWasTheCoinStolen)
-                            .padding(8)
+                            .padding(6)
                             .frame(width: 350, height: 200)
-
-
+                        
                         if model.howWasTheCoinStolen.isEmpty {
                             Text("How was the coin stolen?")
                                 .foregroundColor(.gray)
-                                .padding(.leading, 12)
-                                .padding(.top, 15)
+                                .padding(.leading, 16)
+                                .padding(.top, 12)
                         }
                     }
+                    
+                    ZStack {
+                        Capsule()
+                            .stroke(Color.black, lineWidth: 1)
+                            .frame(width: 350, height: 50)
+                        
+                        HStack {
+                            Spacer()
+                            Text("Coins Stolen:")
+                                .foregroundColor(.black)
+                            TextField("Amount", text: Binding(
+                                get: { String(model.coinsCount) },
+                                set: { newValue in
+                                    if let value = Int(newValue) {
+                                        model.coinsCount = value
+                                    }
+                                }
+                            ))
+                            .keyboardType(.numberPad)
+                            .frame(width: 100)
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                    }
+                    
                     VStack {
-                        if !model.howWasTheCoinStolen.isEmpty && !model.whyWasTheCoinStolen.isEmpty && !model.nameOfAccomplice.isEmpty {
+                        if !model.howWasTheCoinStolen.isEmpty && !model.whyWasTheCoinStolen.isEmpty && !model.nameOfAccomplice.isEmpty && model.coinsCount != 0{
                             NavigationLink(destination: selectLocationFled(viewModel: model)) {
                                 ZStack {
                                     Capsule()
+                                        .stroke(Color.black, lineWidth: 1)
                                         .frame(width: 350, height: 50)
-                                        .foregroundStyle(.blue)
                                     Text("Next")
-                                        .foregroundStyle(.black)
+                                        .foregroundColor(.black)
                                         .bold()
-                                        .font(.system(size: 30))
+                                        .font(.system(size: 20))
                                 }
                             }
                         } else {
@@ -73,27 +102,22 @@ struct informationField: View{
                             }) {
                                 ZStack {
                                     Capsule()
+                                        .stroke(Color.gray, lineWidth: 1)
                                         .frame(width: 350, height: 50)
-                                        .foregroundStyle(.blue)
                                     Text("Next")
-                                        .foregroundStyle(.black)
+                                        .foregroundColor(.gray)
                                         .bold()
-                                        .font(.system(size: 30))
+                                        .font(.system(size: 20))
                                 }
                             }
-                            
                         }
                     }
-
                 }
                 .padding(.top, 20)
-                .alert(isPresented: $model.showAlert){
+                .alert(isPresented: $model.showAlert) {
                     Alert(title: Text("Error"), message: Text("Please fill in all fields"))
                 }
-
-
             }
-
         }
     }
 }
@@ -103,13 +127,16 @@ struct selectLocationFled: View {
         NavigationStack{
             ScrollView{
                 VStack{
-                    Text("Select Location Fled")
+                    Text("Where did the heist happen")
                     LocationPickerView(selectedCoordinate: $viewModel.locationFled)
                     if !(viewModel.locationFled==nil) {
                         VStack{
-                            Text("Location Fled Coordinates")
-                            Text("\(viewModel.locationFled!.latitude)")
-                            Text("\(viewModel.locationFled!.longitude)")
+                            Text("Coordinates Selected")
+                                .font(.headline)
+                            Text("Latitude: \(viewModel.locationFled!.latitude)")
+                                .font(.subheadline)
+                            Text("Longtitude: \(viewModel.locationFled!.longitude)")
+                                .font(.subheadline)
                         }
                     }
                     VStack {
@@ -117,12 +144,12 @@ struct selectLocationFled: View {
                             NavigationLink(destination: selectWhereTheyAreNow(model: viewModel)) {
                                 ZStack {
                                     Capsule()
+                                        .stroke(Color.black, lineWidth: 1)
                                         .frame(width: 350, height: 50)
-                                        .foregroundStyle(.blue)
                                     Text("Next")
-                                        .foregroundStyle(.black)
+                                        .foregroundColor(.black)
                                         .bold()
-                                        .font(.system(size: 30))
+                                        .font(.system(size: 20))
                                 }
                             }
                         } else {
@@ -132,15 +159,14 @@ struct selectLocationFled: View {
                             }) {
                                 ZStack {
                                     Capsule()
+                                        .stroke(Color.gray, lineWidth: 1)
                                         .frame(width: 350, height: 50)
-                                        .foregroundStyle(.blue)
                                     Text("Next")
-                                        .foregroundStyle(.black)
+                                        .foregroundColor(.gray)
                                         .bold()
-                                        .font(.system(size: 30))
+                                        .font(.system(size: 20))
                                 }
                             }
-                            
                         }
                     }
                 }
@@ -152,6 +178,66 @@ struct selectLocationFled: View {
         }
     }
 }
+//struct selectLocationFled: View {
+//    @ObservedObject var viewModel: LogManagementViewModel
+//    var body: some View {
+//        NavigationStack {
+//            ScrollView {
+//                VStack(spacing: 20) {
+//                    Text("Where did the heist happen")
+//                        .font(.headline)
+//
+//                    LocationPickerView(selectedCoordinate: $viewModel.locationFled)
+//                        .frame(height: 300)
+//
+//                    if let location = viewModel.locationFled {
+//                        VStack {
+//                            Text("Selected Location:")
+//                                .font(.subheadline)
+//                            Text("Latitude: \(location.latitude)")
+//                            Text("Longitude: \(location.longitude)")
+//                        }
+//                    }
+//
+//                    VStack {
+//                        if viewModel.locationFled != nil {
+//                            NavigationLink(destination: selectWhereTheyAreNow(model: viewModel)) {
+//                                ZStack {
+//                                    Capsule()
+//                                        .stroke(Color.black, lineWidth: 1)
+//                                        .frame(width: 350, height: 50)
+//                                    Text("Next")
+//                                        .foregroundColor(.black)
+//                                        .bold()
+//                                        .font(.system(size: 20))
+//                                }
+//                            }
+//                        } else {
+//                            Button(action: {
+//                                viewModel.generator.notificationOccurred(.error)
+//                                viewModel.showAlert.toggle()
+//                            }) {
+//                                ZStack {
+//                                    Capsule()
+//                                        .stroke(Color.gray, lineWidth: 1)
+//                                        .frame(width: 350, height: 50)
+//                                    Text("Next")
+//                                        .foregroundColor(.gray)
+//                                        .bold()
+//                                        .font(.system(size: 20))
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                .padding(.top, 20)
+//                .alert(isPresented: $viewModel.showAlert) {
+//                    Alert(title: Text("Error"), message: Text("Please select a location"))
+//                }
+//            }
+//        }
+//    }
+//}
 struct selectWhereTheyAreNow: View {
     @ObservedObject var model : LogManagementViewModel
     @Environment(\.dismiss) var dismiss
@@ -159,43 +245,60 @@ struct selectWhereTheyAreNow: View {
         NavigationStack{
             ScrollView{
                 VStack{
-                    Text("Select Where are they now")
+                    Text("Where did the person flee to")
                     LocationPickerView(selectedCoordinate: $model.locationNow)
                     if !(model.locationNow==nil) {
                         VStack{
-                            Text("Location Fled Coordinates")
-                            Text("\(model.locationNow!.latitude)")
-                            Text("\(model.locationNow!.longitude)")
+                            Text("Coordinates Selected")
+                                .font(.headline)
+                            Text("Latitude: \(model.locationNow!.latitude)")
+                                .font(.subheadline)
+                            Text("Longtitude: \(model.locationNow!.longitude)")
+                                .font(.subheadline)
                         }
                     }
-                    Button{
-                        let success = model.verify()
-                        if success == true{
-                            print("Success")
-                            model.add()
-                            model.showNewItemView.toggle()
-                            model.generator.notificationOccurred(.success)
-                        }else{
-                            print("Failure")
-                            model.showAlert.toggle()
-                            model.generator.notificationOccurred(.error)
-                        }
-                        
-                    }label: {
-                        ZStack{
-                            Capsule()
-                                .frame(width: 350, height: 50)
-                                .foregroundStyle(.blue)
-                            VStack{
-                                Text("Add")
-                                    .foregroundStyle(.black)
-                                    .bold()
-                                    .font(.system(size: 30))
-                                
+                    VStack {
+                        if model.locationNow != nil {
+                            NavigationLink(destination: dateSelect(model: model)) {
+                                ZStack {
+                                    Capsule()
+                                        .stroke(Color.black, lineWidth: 1)
+                                        .frame(width: 350, height: 50)
+                                    Text("Next")
+                                        .foregroundColor(.black)
+                                        .bold()
+                                        .font(.system(size: 20))
+                                }
+                            }
+                        } else {
+                            Button(action: {
+                                model.generator.notificationOccurred(.error)
+                                model.showAlert.toggle()
+                            }) {
+                                ZStack {
+                                    Capsule()
+                                        .stroke(Color.gray, lineWidth: 1)
+                                        .frame(width: 350, height: 50)
+                                    Text("Next")
+                                        .foregroundColor(.gray)
+                                        .bold()
+                                        .font(.system(size: 20))
+                                }
                             }
                         }
-
                     }
+//                    NavigationLink(destination: dateSelect(model: model)) {
+//                        ZStack {
+//                            Capsule()
+//                                .frame(width: 350, height: 50)
+//                                .foregroundStyle(.blue)
+//                            Text("Next")
+//                                .foregroundStyle(.black)
+//                                .bold()
+//                                .font(.system(size: 30))
+//                        }
+//                    }
+                    
                 }
                 .padding(.top, 20)
 
@@ -203,7 +306,49 @@ struct selectWhereTheyAreNow: View {
             
         }
         .alert(isPresented: $model.showAlert){
-            Alert(title: Text("Error"), message: Text("Please ensure that all fields are filled up"))
+            Alert(title: Text("Error"), message: Text("Please select a location"))
+        }
+    }
+}
+struct dateSelect: View {
+    @ObservedObject var model: LogManagementViewModel
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                Text("When did it happen?")
+                    .font(.headline)
+                DatePicker("Date Happened", selection: $model.dateHappened)
+                    .datePickerStyle(GraphicalDatePickerStyle())
+                    .frame(maxWidth: 350)
+                
+                Button(action: {
+                    let success = model.verify()
+                    if success {
+                        print("Success")
+                        model.add()
+                        model.showNewItemView.toggle()
+                        model.generator.notificationOccurred(.success)
+                    } else {
+                        print("Failure")
+                        model.showAlert.toggle()
+                        model.generator.notificationOccurred(.error)
+                    }
+                }) {
+                    ZStack {
+                        Capsule()
+                            .stroke(Color.black, lineWidth: 1)
+                            .frame(width: 350, height: 50)
+                        Text("Add")
+                            .foregroundColor(.black)
+                            .bold()
+                            .font(.system(size: 20))
+                    }
+                }
+                .alert(isPresented: $model.showAlert) {
+                    Alert(title: Text("Error"), message: Text("Please select a location"))
+                }
+            }
+            .padding(.top, 20)
         }
     }
 }

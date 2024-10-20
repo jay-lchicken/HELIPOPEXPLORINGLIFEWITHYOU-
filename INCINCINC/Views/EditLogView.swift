@@ -8,25 +8,26 @@
 import SwiftUI
 
 import MapKit
-struct informationField: View {
+struct editInformationField: View {
     @ObservedObject var model: LogManagementViewModel
+    @State var editIndex: Int
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 10) {
                     ZStack {
                         Capsule()
-                            .stroke(Color.gray, lineWidth: 1)
+                            .stroke(Color.black, lineWidth: 1)
                             .frame(width: 350, height: 50)
                         
-                        TextField("Name of Accomplice", text: $model.nameOfAccomplice)
+                        TextField("Name of Accomplice(s)", text: $model.nameOfAccomplice)
                             .padding(.horizontal)
                             .frame(width: 350, height: 50)
                     }
                     
                     ZStack(alignment: .topLeading) {
                         RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.gray, lineWidth: 1)
+                            .stroke(Color.black, lineWidth: 1)
                             .frame(width: 350, height: 200)
                         
                         TextEditor(text: $model.whyWasTheCoinStolen)
@@ -43,7 +44,7 @@ struct informationField: View {
                     
                     ZStack(alignment: .topLeading) {
                         RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.gray, lineWidth: 1)
+                            .stroke(Color.black, lineWidth: 1)
                             .frame(width: 350, height: 200)
                         
                         TextEditor(text: $model.howWasTheCoinStolen)
@@ -60,13 +61,13 @@ struct informationField: View {
                     
                     ZStack {
                         Capsule()
-                            .stroke(Color.gray, lineWidth: 1)
+                            .stroke(Color.black, lineWidth: 1)
                             .frame(width: 350, height: 50)
                         
                         HStack {
                             Spacer()
                             Text("Coins Stolen:")
-                                .foregroundColor(.gray)
+                                .foregroundColor(.black)
                             TextField("Amount", text: Binding(
                                 get: { String(model.coinsCount) },
                                 set: { newValue in
@@ -84,7 +85,7 @@ struct informationField: View {
                     
                     VStack {
                         if !model.howWasTheCoinStolen.isEmpty && !model.whyWasTheCoinStolen.isEmpty && !model.nameOfAccomplice.isEmpty && model.coinsCount != 0{
-                            NavigationLink(destination: selectLocationFled(viewModel: model)) {
+                            NavigationLink(destination: editSelectLocationFled(viewModel: model, editIndex: editIndex)) {
                                 ZStack {
                                     Capsule()
                                         .stroke(Color.black, lineWidth: 1)
@@ -121,8 +122,9 @@ struct informationField: View {
         }
     }
 }
-struct selectLocationFled: View {
+struct editSelectLocationFled: View {
     @ObservedObject var viewModel : LogManagementViewModel
+    @State var editIndex: Int
     var body: some View{
         NavigationStack{
             ScrollView{
@@ -131,14 +133,17 @@ struct selectLocationFled: View {
                     LocationPickerView(selectedCoordinate: $viewModel.locationFled)
                     if !(viewModel.locationFled==nil) {
                         VStack{
-                            Text("Location")
-                            Text("\(viewModel.locationFled!.latitude)")
-                            Text("\(viewModel.locationFled!.longitude)")
+                            Text("Coordinates Selected")
+                                .font(.headline)
+                            Text("Latitude: \(viewModel.locationFled!.latitude)")
+                                .font(.subheadline)
+                            Text("Longtitude: \(viewModel.locationFled!.longitude)")
+                                .font(.subheadline)
                         }
                     }
                     VStack {
                         if viewModel.locationFled != nil {
-                            NavigationLink(destination: selectWhereTheyAreNow(model: viewModel)) {
+                            NavigationLink(destination: editSelectWhereTheyAreNow(model: viewModel, editIndex: editIndex)) {
                                 ZStack {
                                     Capsule()
                                         .stroke(Color.black, lineWidth: 1)
@@ -235,8 +240,9 @@ struct selectLocationFled: View {
 //        }
 //    }
 //}
-struct selectWhereTheyAreNow: View {
+struct editSelectWhereTheyAreNow: View {
     @ObservedObject var model : LogManagementViewModel
+    @State var editIndex: Int
     @Environment(\.dismiss) var dismiss
     var body: some View{
         NavigationStack{
@@ -246,22 +252,45 @@ struct selectWhereTheyAreNow: View {
                     LocationPickerView(selectedCoordinate: $model.locationNow)
                     if !(model.locationNow==nil) {
                         VStack{
-                            Text("Location")
-                            Text("\(model.locationNow!.latitude)")
-                            Text("\(model.locationNow!.longitude)")
+                            Text("Coordinates Selected")
+                                .font(.headline)
+                            Text("Latitude: \(model.locationNow!.latitude)")
+                                .font(.subheadline)
+                            Text("Longtitude: \(model.locationNow!.longitude)")
+                                .font(.subheadline)
                         }
                     }
-                    NavigationLink(destination: dateSelect(model: model)) {
-                        ZStack {
-                            Capsule()
-                                .frame(width: 350, height: 50)
-                                .foregroundStyle(.blue)
-                            Text("Next")
-                                .foregroundStyle(.black)
-                                .bold()
-                                .font(.system(size: 30))
+                    VStack {
+                        if model.locationNow != nil {
+                            NavigationLink(destination: editDateSelect(model: model, editIndex: editIndex)) {
+                                ZStack {
+                                    Capsule()
+                                        .stroke(Color.black, lineWidth: 1)
+                                        .frame(width: 350, height: 50)
+                                    Text("Next")
+                                        .foregroundColor(.black)
+                                        .bold()
+                                        .font(.system(size: 20))
+                                }
+                            }
+                        } else {
+                            Button(action: {
+                                model.generator.notificationOccurred(.error)
+                                model.showAlert.toggle()
+                            }) {
+                                ZStack {
+                                    Capsule()
+                                        .stroke(Color.gray, lineWidth: 1)
+                                        .frame(width: 350, height: 50)
+                                    Text("Next")
+                                        .foregroundColor(.gray)
+                                        .bold()
+                                        .font(.system(size: 20))
+                                }
+                            }
                         }
                     }
+
                     
                 }
                 .padding(.top, 20)
@@ -274,22 +303,27 @@ struct selectWhereTheyAreNow: View {
         }
     }
 }
-struct dateSelect: View {
+struct editDateSelect: View {
     @ObservedObject var model: LogManagementViewModel
+    @State var editIndex: Int
+    @Environment(\.dismiss) var dismiss
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
+                Text("When did it happen?")
+                    .font(.headline)
                 DatePicker("Date Happened", selection: $model.dateHappened)
                     .datePickerStyle(GraphicalDatePickerStyle())
                     .frame(maxWidth: 350)
                 
                 Button(action: {
+                    print("Saved")
                     let success = model.verify()
                     if success {
                         print("Success")
-                        model.add()
-                        model.showNewItemView.toggle()
+                        model.edit(editIndex: editIndex)
                         model.generator.notificationOccurred(.success)
+                        model.isEditing.toggle()
                     } else {
                         print("Failure")
                         model.showAlert.toggle()
@@ -300,136 +334,17 @@ struct dateSelect: View {
                         Capsule()
                             .stroke(Color.black, lineWidth: 1)
                             .frame(width: 350, height: 50)
-                        Text("Add")
+                        Text("Save")
                             .foregroundColor(.black)
                             .bold()
                             .font(.system(size: 20))
                     }
                 }
                 .alert(isPresented: $model.showAlert) {
-                    Alert(title: Text("Error"), message: Text("Please select a location"))
+                    Alert(title: Text("Error"), message: Text("Please select a date"))
                 }
             }
             .padding(.top, 20)
         }
     }
 }
-struct LocationPickerView: View {
-    @State private var searchText = ""
-    @Binding var selectedCoordinate: CLLocationCoordinate2D?
-    @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
-                                                   span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)) //Default Location is San Francisco
-    
-    var body: some View {
-        VStack {
-            Spacer()
-            SearchBar(text: $searchText, onSearchButtonClicked: performSearch)
-            
-            
-            SelectionMapView(selectedCoordinate: $selectedCoordinate, region: $region)
-                .frame(height: 400)
-            
-            
-            
-            Spacer()
-        }
-        .padding()
-    }
-    
-    private func performSearch() {
-        let request = MKLocalSearch.Request()
-        request.naturalLanguageQuery = searchText
-        
-        let search = MKLocalSearch(request: request)
-        search.start { response, error in
-            if let response = response {
-                let item = response.mapItems.first
-                if let coordinate = item?.placemark.coordinate {
-                    region = MKCoordinateRegion(center: coordinate,
-                                                span: MKCoordinateSpan(latitudeDelta: 0.001, longitudeDelta: 0.001)) //Show a 1km Radius
-                }
-            }
-        }
-    }
-}
-
-struct SearchBar: UIViewRepresentable {
-    @Binding var text: String
-    var onSearchButtonClicked: () -> Void
-    
-    func makeUIView(context: Context) -> UISearchBar {
-        let searchBar = UISearchBar(frame: .zero)
-        searchBar.delegate = context.coordinator
-        searchBar.placeholder = "Search"
-        return searchBar
-    }
-    
-    func updateUIView(_ uiView: UISearchBar, context: Context) {
-        uiView.text = text
-    }
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    class Coordinator: NSObject, UISearchBarDelegate {
-        var parent: SearchBar
-        
-        init(_ parent: SearchBar) {
-            self.parent = parent
-        }
-        
-        func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-            parent.text = searchText
-        }
-        
-        func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-            parent.onSearchButtonClicked()
-            searchBar.resignFirstResponder()
-        }
-    }
-}
-
-struct SelectionMapView: UIViewRepresentable {
-    @Binding var selectedCoordinate: CLLocationCoordinate2D?
-    @Binding var region: MKCoordinateRegion
-    
-    func makeUIView(context: Context) -> MKMapView {
-        let mapView = MKMapView()
-        mapView.delegate = context.coordinator
-        
-        let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleMapTap))
-        mapView.addGestureRecognizer(tapGesture)
-        
-
-        mapView.isZoomEnabled = true
-        mapView.isScrollEnabled = true
-        
-        return mapView
-    }
-    
-    func updateUIView(_ uiView: MKMapView, context: Context) {
-        uiView.setRegion(region, animated: true)
-    }
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    class Coordinator: NSObject, MKMapViewDelegate {
-        var parent: SelectionMapView
-        
-        init(_ parent: SelectionMapView) {
-            self.parent = parent
-        }
-        
-        @objc func handleMapTap(gestureRecognizer: UITapGestureRecognizer) {
-            let mapView = gestureRecognizer.view as! MKMapView
-            let touchPoint = gestureRecognizer.location(in: mapView)
-            let coordinate = mapView.convert(touchPoint, toCoordinateFrom: mapView)
-            
-            parent.selectedCoordinate = coordinate
-        }
-    }
-}
-

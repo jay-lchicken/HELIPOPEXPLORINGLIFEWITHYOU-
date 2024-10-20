@@ -24,7 +24,7 @@ struct LogDetailsView: View {
                     .padding(.bottom, 4)
                 
                 VStack(alignment: .leading) {
-                    Label("Name of Accomplice:", systemImage: "person.fill")
+                    Label("Name of Accomplice(s):", systemImage: "person.fill")
                         .font(.headline)
                     Text(log.nameOfAccomplice)
                         .font(.body)
@@ -40,8 +40,27 @@ struct LogDetailsView: View {
                 }
                 
                 Divider()
+                
+
+
                 VStack(alignment: .leading) {
-                    Label("Where did they flee: ", systemImage: "location.fill")
+                    Label("Why was the Coin Stolen:", systemImage: "questionmark.circle.fill")
+                        .font(.headline)
+                    Text(log.whyStolen)
+                        .font(.body)
+                    
+                    
+                }
+                Divider()
+                VStack(alignment: .leading) {
+                    Label("Number of coins stolen", systemImage: "bitcoinsign.circle")
+                        .font(.headline)
+                    Text("\(log.coinsCount)")
+                        .font(.body)
+                }
+                Divider()
+                VStack(alignment: .leading) {
+                    Label("Where the heist happened: ", systemImage: "location.fill")
                         .font(.headline)
                     Text("\(log.locationFled.latitude), \(log.locationFled.longitude)")
                         .font(.body)
@@ -51,9 +70,10 @@ struct LogDetailsView: View {
                         .cornerRadius(8)
                 }
                 Divider()
+                
 
                 VStack(alignment: .leading) {
-                    Label("Where are they now:", systemImage: "location.fill")
+                    Label("Where did they escape to:", systemImage: "location.fill")
                         .font(.headline)
                     Text("\(log.whereAreTheyNow.latitude), \(log.whereAreTheyNow.longitude)")
                         .font(.body)
@@ -62,22 +82,15 @@ struct LogDetailsView: View {
                         .frame(height: 200)
                         .cornerRadius(8)
                 }
-                
                 Divider()
-
-
-                VStack(alignment: .leading) {
-                    Label("Why was the Coin Stolen:", systemImage: "questionmark.circle.fill")
+                VStack(alignment: .leading){
+                    Label("Date Happened:", systemImage: "calendar")
                         .font(.headline)
-                    Text(log.whyStolen)
+                    Text("\(Date(timeIntervalSince1970: log.dateHappened).formatted(date: .abbreviated, time: .shortened))")
                         .font(.body)
                     
-                    Label("Date Added:", systemImage: "calendar")
-                        .font(.headline)
-                    Text("\(Date(timeIntervalSince1970: log.dateAdded).formatted(date: .abbreviated, time: .shortened))")
-                        .font(.body)
                 }
-
+                Divider()
                 Spacer()
             }
         }

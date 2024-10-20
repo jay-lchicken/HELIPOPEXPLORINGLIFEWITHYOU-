@@ -14,7 +14,8 @@ struct log: Identifiable, Codable {
     let whyStolen: String
     let whereAreTheyNow: LocationData
     let howTheyStoleTheCoin: String
-    
+    let coinsCount: Int
+    let dateHappened: TimeInterval
     struct LocationData: Codable {
         let latitude: Double
         let longitude: Double
@@ -26,6 +27,9 @@ struct log: Identifiable, Codable {
 
         func toCLLocation() -> CLLocation {
             return CLLocation(latitude: latitude, longitude: longitude)
+        }
+        func toCLLocationCoordinate2D() -> CLLocationCoordinate2D {
+            return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         }
     }
 }
